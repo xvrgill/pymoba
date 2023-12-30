@@ -1,0 +1,16 @@
+---
+project:
+  name: pymoba
+  authors:
+    - name: Xavier C. Gill
+      email: xaviercgill@gmail.com
+  make_settings:
+    requirements_filename: requirements.txt
+    save_requirements_with: pipreqs
+    pipreqs_settings:
+      commands:
+        freeze_default: pipreqs --force
+    pip_settings:
+      commands:
+        freeze_Default: pip3 freeze >
+  script_path: scripts
