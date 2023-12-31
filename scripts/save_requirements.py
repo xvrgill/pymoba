@@ -2,8 +2,12 @@ import yaml
 import subprocess
 from pathlib import Path
 import pexpect
+import os
 
-with open('../config.yaml', 'r') as config:
+curr_dir = Path(__file__).parent
+
+# with open('../config.yaml', 'r') as config:
+with open(curr_dir / '../config.yaml', 'r') as config:
     config_data = yaml.safe_load(config)
 
 project_settings = config_data['project']
@@ -24,17 +28,17 @@ if save_reqs_with not in valid_save_reqs_with_options:
 
 # Define output path specification depending on config
 if save_reqs_with == 'pipreqs':
-    output_path = '/'.join(['.', '..'])
-    check_file_path = '/'.join([output_path, 'requirements.txt'])
+    output_path = curr_dir / '..'
+    check_file_path = output_path / 'requirements.txt'
 elif save_reqs_with == 'pip':
-    output_path = script_path / '..' / 'requirements.txt'
+    output_path = curr_dir / '..' / 'requirements.txt'
     check_file_path = output_path
 else:
     __msg__ = 'No output path set for saving project requirements'
     raise ValueError(__msg__)
 
 # Construct bash script
-bash_script = Path('./save_requirements.sh')
+bash_script = curr_dir / 'save_requirements.sh'
 print(f'Script path: {bash_script}')
 bash_command = [str(bash_script.absolute()), save_reqs_with, str(output_path), str(check_file_path)]
 
