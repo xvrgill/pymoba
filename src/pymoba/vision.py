@@ -80,9 +80,13 @@ class PlatformCapture(ABC):
             frame = self.capture_frame()
             start_time = self._open_live_capture(frame, start_time)
             # Exit image capture and destroy windows when 'q' is pressed
+            # TODO: Update this to include screenshot logic
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 cv2.destroyAllWindows()
                 break
+
+    def _get_latest_img_idx(self, target_dir):
+
 
     def capture_window(self, window_name: str):
         """Display a realtime capture of the entire screen.
@@ -93,14 +97,30 @@ class PlatformCapture(ABC):
         """
         # While the loop isn't broken, display frame from screen capture
         start_time = time.time()
+        pos_saved_image_idx = 0
+        neg_saved_image_idx = 0
         while True:
             frame = self.capture_window_frame(window_name)
             cv2.imshow('Screen Capture', frame)
             start_time = self._open_live_capture(frame, start_time)
             # Exit image capture and destroy windows when 'q' is pressed
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+            key = cv2.waitKey(1)
+            # TODO: Decouple this logic to specify where images are stored
+            if key & 0xFF == ord('q'):
                 cv2.destroyAllWindows()
                 break
+            elif key & 0xFF == ord('p'):
+                # Save positive target images
+                cv2.imwrite(
+                    f'cascade/images/minions/ally/positive/{pos_saved_image_idx}.jpg',
+                    frame)
+                pos_saved_image_idx += 1
+            elif key & 0xFF == ord('n'):
+                cv2.imwrite(
+                    f'cascade/images/minions/ally/negative/{neg_saved_image_idx}.jpg',
+                    frame)
+                neg_saved_image_idx += 1
+
 
 
 class MacCapture(PlatformCapture):
@@ -206,9 +226,9 @@ class MacCapture(PlatformCapture):
         image.shape = (height, actual_width, 4)
         image = image[:, :actual_width, :]
         # Convert to cv2 image
-        cv2_image = cv2.cvtColor(image, cv2.COLOR_RGBA2BGR)
+        bgr_image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
 
-        return cv2_image
+        return bgr_image
 
     def capture_window_frame(self, window_name: str):
         window_info = self.get_window_by_name(window_name)
@@ -279,7 +299,7 @@ if __name__ == '__main__':
 
     # Start and display window screen capture
     # capture.capture_window('League of Legends')
-    capture.capture_window('<Window Name>')
+    capture.capture_window('League of Legends (TM) Client')
 
     # Get list of windows
     # windows = capture.get_windows()
